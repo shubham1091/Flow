@@ -5,24 +5,32 @@ import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
 import Button from "@/components/Button";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
+import { useRouter } from "expo-router";
 
 const Welcome = () => {
+  const router = useRouter()
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         {/* login button and image */}
         <View>
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={()=> router.push("/(auth)/login")}>
             <Typo fontWeight={"500"}>Sign in</Typo>
           </TouchableOpacity>
-          <Image
+          <Animated.Image
+            entering={FadeIn.duration(1000)}
             source={require("@/assets/images/welcome.png")}
             style={styles.welcomeImage}
             resizeMode="contain"
           />
         </View>
         <View style={styles.footer}>
-          <View style={{ alignItems: "center" }}>
+          <Animated.View
+            entering={FadeInDown.duration(1000).springify().damping(12)}
+            style={{ alignItems: "center" }}
+          >
             <Typo
               size={30}
               fontWeight={"800"}
@@ -35,18 +43,43 @@ const Welcome = () => {
             >
               of your finances
             </Typo>
-          </View>
-          <View style={{alignItems:"center", gap:2}}>
-            <Typo size={17} color={colors.textLight}>
-                Finance must be arranged to set a better
+          </Animated.View>
+          <Animated.View
+            entering={FadeInDown.duration(1000)
+              .delay(100)
+              .springify()
+              .damping(12)}
+            style={{ alignItems: "center", gap: 2 }}
+          >
+            <Typo
+              size={17}
+              color={colors.textLight}
+            >
+              Finance must be arranged to set a better
             </Typo>
-            <Typo size={17} color={colors.textLight}>lifestyle in future</Typo>
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button>
-                <Typo size={22} color={colors.neutral900}>Get Started</Typo>
+            <Typo
+              size={17}
+              color={colors.textLight}
+            >
+              lifestyle in future
+            </Typo>
+          </Animated.View>
+          <Animated.View
+            entering={FadeInDown.duration(1000)
+              .delay(200)
+              .springify()
+              .damping(12)}
+            style={styles.buttonContainer}
+          >
+            <Button onPress={()=> router.push("/(auth)/register")}>
+              <Typo
+                size={22}
+                color={colors.neutral900}
+              >
+                Get Started
+              </Typo>
             </Button>
-          </View>
+          </Animated.View>
         </View>
       </View>
     </ScreenWrapper>
@@ -57,7 +90,7 @@ export default Welcome;
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     justifyContent: "space-between",
     paddingTop: spacingY._7,
   },
