@@ -25,19 +25,25 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
         router.replace("/(auth)/welcome")
       }
     })
+    updateUserData(user?.uid || "")
     return () => {
       unsub();
     }
   },[])
 
-  const login = async (email:string, password:string) => {
+  const login = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
     } catch (error:any) {
+      let msg= error.message;
+      console.log("Error registering user:", msg);
+      if (msg.includes("(auth/invalid-credential)")) msg = "Invalid credentials";
+      if (msg.includes("(auth/invalid-email)")) msg = "Invalid email";
       return { success: false, msg: error.message };
     }
   };
+  
 
   const register = async (email:string, password:string, name:string) => {
     try {
@@ -53,7 +59,11 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
       });
       return { success: true };
     } catch (error:any) {
-      return { success: false, msg: error.message };
+      let msg= error.message;
+      console.log("Error registering user:", msg);
+      if (msg.includes("(auth/invalid-credential)")) msg = "Invalid credentials";
+      if (msg.includes("(auth/invalid-email)")) msg = "Invalid email";
+      return { success: false, msg };
     }
   };
 
@@ -69,7 +79,7 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
           name: data.name || null,
           image: data.image || null,
         };
-        setUser(userData);
+        setUser({...userData});
       }
     } catch (error:any) {
       console.log("Error updating user data:", error.message);
