@@ -17,15 +17,17 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
 
   useEffect(()=>{
     const unsub = onAuthStateChanged(auth, (user)=>{
+      // console.log("user", user);
       if(user){
         setUser({uid: user.uid, email: user.email, name: user.displayName})
+        updateUserData(user?.uid || "")
         router.replace("/(tabs)")
       }else{
         setUser(null)
         router.replace("/(auth)/welcome")
       }
     })
-    updateUserData(user?.uid || "")
+    
     return () => {
       unsub();
     }
@@ -52,10 +54,10 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
         email,
         password
       );
-      await setDoc(doc(firestore, "users", response.user.uid), {
+      await setDoc(doc(firestore, "users", response?.user?.uid), {
         name,
         email,
-        uid: response.user.uid,
+        uid: response?.user?.uid,
       });
       return { success: true };
     } catch (error:any) {
@@ -73,7 +75,8 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const userData= {
+        console.log("Document data:", data);
+        const userData: UserType= {
           uid: data.uid,
           email: data.email || null,
           name: data.name || null,
@@ -101,7 +104,7 @@ export const AuthProvider:FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
+export const useAuth = ():AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
