@@ -1,13 +1,19 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { TransactionItemProps, TransactionListType } from "@/types";
+import {
+  TransactionItemProps,
+  TransactionListType,
+  TransactionType,
+} from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
 import Loading from "./Loading";
-import { expenseCategories } from "@/constants/data";
+import { expenseCategories, incomeCategory } from "@/constants/data";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Timestamp } from "firebase/firestore";
+import { useRouter } from "expo-router";
 
 const TransactionList = ({
   data,
@@ -15,8 +21,22 @@ const TransactionList = ({
   loading,
   emptyListMessage,
 }: TransactionListType) => {
-  const handleClick = () => {
-    console.log("Item clicked:");
+  const router = useRouter();
+  const handleClick = (item: TransactionType) => {
+    router.push({
+      pathname: "/(modals)/transactionModal",
+      params: {
+        id: item.id,
+        type: item.type,
+        amount: item.amount,
+        category: item.category,
+        date: (item.date as Timestamp).toDate().toISOString(),
+        description: item.description,
+        image: item.image,
+        uid: item.uid,
+        walletId: item.walletId,
+      },
+    });
   };
   return (
     <View style={styles.container}>
@@ -66,8 +86,16 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
-  let category = expenseCategories["groceries"];
+  // console.log("item description", item.description);
+  let category =
+    item.type == "expense" ? expenseCategories[item.category!] : incomeCategory;
   const IconComponent = category.icon;
+
+  const date = (item.date as Timestamp).toDate().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 70)
@@ -100,15 +128,15 @@ const TransactionItem = ({
         <View style={styles.amountDate}>
           <Typo
             fontWeight={"500"}
-            color={colors.primary}
+            color={item.type == "income" ? colors.primary : colors.rose}
           >
-            + ${item.amount}
+            {item.type == "income" ? "+" : "-"} ${item.amount}
           </Typo>
           <Typo
             size={13}
             color={colors.neutral400}
           >
-            12 Jan
+            {date}
           </Typo>
         </View>
       </TouchableOpacity>

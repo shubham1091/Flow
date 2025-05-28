@@ -1,6 +1,6 @@
 import { ResponseType, WalletType } from "@/types";
 import { uploadFileToCloudinary } from "./imageService";
-import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, setDoc, where, writeBatch } from "firebase/firestore";
 import { firestore } from "@/config/firebase";
 
 export const createOrUpdateWallet = async (
@@ -48,19 +48,58 @@ export const createOrUpdateWallet = async (
 };
 
 export const deleteWallet = async (walletId: string): Promise<ResponseType> => {
-  try{
+  try {
     const walletref = doc(firestore, "wallets", walletId);
     await deleteDoc(walletref);
 
     // todo: delete all transactions related to this wallet
+    deleteTransactionByWallet(walletId);
 
     return { success: true, msg: "Wallet deleted successfully" };
-
-  }catch (error: any) {
+  } catch (error: any) {
     console.log("Error deleting wallet", error);
     return {
       success: false,
       msg: error.message || "Error deleting wallet",
     };
   }
-}
+};
+
+export const deleteTransactionByWallet = async (
+  walletId: string
+): Promise<ResponseType> => {
+  try {
+    let hasMoreTransactions = true;
+
+    while (hasMoreTransactions) {
+      const transactionQuery = query(
+        collection(firestore, "transactions"),
+        where("walletId", "==", walletId)
+      )
+
+      const transactionSnapshot = await getDocs(transactionQuery);
+
+      if(transactionSnapshot.size == 0){
+        hasMoreTransactions = false;
+        break;
+      }
+
+      const batch = writeBatch(firestore);
+      transactionSnapshot.forEach((transactionDoc)=>{
+        batch.delete(transactionDoc.ref);
+      })
+
+      await batch.commit();
+    }
+
+    // todo: delete all transactions related to this wallet
+
+    return { success: true, msg: "transactions deleted successfully" };
+  } catch (error: any) {
+    console.log("Error deleting wallet", error);
+    return {
+      success: false,
+      msg: error.message || "Error deleting transactions",
+    };
+  }
+};

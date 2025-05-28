@@ -10,11 +10,28 @@ import HomeCard from "@/components/HomeCard";
 import TransactionList from "@/components/TransactionList";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
+import { limit, orderBy, where } from "firebase/firestore";
+import { useFetchData } from "@/hooks/useFatchData";
+import { TransactionType } from "@/types";
 
 const Home = () => {
   const { user } = useAuth();
 
   const router = useRouter();
+
+  const constraints = [
+    where("uid", "==", user?.uid),
+    orderBy("date", "desc"),
+    limit(30),
+  ];
+
+  const {
+    data: recentTransactions,
+    error,
+    loading: transactionLoading,
+  } = useFetchData<TransactionType>("transactions", constraints);
+
+  console.log("recentTransactions", recentTransactions);
 
   return (
     <ScreenWrapper>
@@ -52,20 +69,8 @@ const Home = () => {
 
           <TransactionList
             title="Recent Transactions"
-            data={[
-              {
-                id: "as",
-                type: "expense",
-                amount: 123,
-                category: "Food",
-                date: "2023-10-01",
-                description: "Lunch at a restaurant",
-                image: null,
-                uid: "user123",
-                walletId: "wallet123",
-              },
-            ]}
-            loading={false}
+            data={recentTransactions}
+            loading={transactionLoading}
             emptyListMessage="No transactions found."
           />
         </ScrollView>
