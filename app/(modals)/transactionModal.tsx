@@ -29,6 +29,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import Input from "@/components/Input";
+import { createOrUpdateTransaction } from "@/services/transactionService";
 
 const TransactionModal = () => {
   const { user, updateUserData } = useAuth();
@@ -86,7 +87,17 @@ const TransactionModal = () => {
     };
 
     console.log("transactionData", transactionData);
-    
+
+    //todo: include tranaction id for updating
+    setLoading(true);
+    const res = await createOrUpdateTransaction(transactionData);
+
+    setLoading(false);
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Error", res.msg || "Error creating transaction");
+    }
   };
 
   const onDelete = async () => {
