@@ -18,18 +18,22 @@ const StackLayout = () => {
         name="(modals)/transactionModal"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="(modals)/searchModal"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
   );
 };
 
 // export default _layout;
 
-export default function RootLayout(){
+export default function RootLayout() {
   return (
     <AuthProvider>
       <StackLayout />
     </AuthProvider>
-  )
+  );
 }
 
 const styles = StyleSheet.create({});

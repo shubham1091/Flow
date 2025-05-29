@@ -8,12 +8,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCyGY2nFTgWBbDt2_nlpSVkub65Dml2XbA",
-  authDomain: "flow-5f886.firebaseapp.com",
-  projectId: "flow-5f886",
-  storageBucket: "flow-5f886.firebasestorage.app",
-  messagingSenderId: "461731270771",
-  appId: "1:461731270771:web:feca3f2f48f1b70a901a06"
+  apiKey: "AIzaSyDLSYwh_xwfJE39yAZl1t0SaAQb3nkm-eQ",
+  authDomain: "flow-8e357.firebaseapp.com",
+  projectId: "flow-8e357",
+  storageBucket: "flow-8e357.firebasestorage.app",
+  messagingSenderId: "510986593323",
+  appId: "1:510986593323:web:cb5827a57ee8cf0be4b66e"
 };
 
 // Initialize Firebase
